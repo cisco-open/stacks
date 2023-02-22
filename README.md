@@ -1,1 +1,1 @@
-# stacks
+# Stacks for Terraform

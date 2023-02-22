@@ -1,0 +1,4 @@
+Empty file.
+
+This means there's no layer-level overrides, but we need an empty file so that
+the directory is tracked in git.
