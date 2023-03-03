@@ -42,9 +42,9 @@ instance    = layer_split[1] if len(layer_split) > 1 else None  # the layer's in
 variables = {
     **helpers.hcl2_read([
         envdir.joinpath("environment.tfvars"),
-        stacksdir.joinpath("common.tfvars"),
-        stackdir.joinpath("stack.tfvars"),
-        cwd.joinpath("layer.tfvars"),
+        stacksdir.joinpath("*.common.tfvars"), stacksdir.joinpath("common.tfvars"),
+        stackdir.joinpath("*.stack.tfvars"), stackdir.joinpath("stack.tfvars"),
+        cwd.joinpath("*.layer.tfvars"), cwd.joinpath("layer.tfvars"),
     ]),
     "stacks-root": "../../../../..",                 # repository root, relative to workdir
     "stacks-path": f"stacks/{stack}/layer/{layer}",  # layer path, relative to repository root
@@ -74,5 +74,4 @@ for module in helpers.json_read([modulesdir.joinpath("modules.json")]).get("Modu
         repo.git.commit("-m", "stacks: postinit checkpoint")
 
     # render files
-    files_tf = sorted(glob.glob(str(workdir.joinpath("*.tf"))))
-    helpers.jinja2_render(files_tf, {"var": variables})
+    helpers.jinja2_render([workdir.joinpath("*.tf")], {"var": variables})

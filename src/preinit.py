@@ -49,9 +49,9 @@ helpers.directory_remove(workdir, keep=[
 variables = {
     **helpers.hcl2_read([
         envdir.joinpath("environment.tfvars"),
-        stacksdir.joinpath("common.tfvars"),
-        stackdir.joinpath("stack.tfvars"),
-        cwd.joinpath("layer.tfvars"),
+        stacksdir.joinpath("*.common.tfvars"), stacksdir.joinpath("common.tfvars"),
+        stackdir.joinpath("*.stack.tfvars"), stackdir.joinpath("stack.tfvars"),
+        cwd.joinpath("*.layer.tfvars"), cwd.joinpath("layer.tfvars"),
     ]),
     "stacks-root": "../../../../..",                 # repository root, relative to workdir
     "stacks-path": f"stacks/{stack}/layer/{layer}",  # layer path, relative to repository root
@@ -65,16 +65,13 @@ variables = {
 reserved = [".terraform", ".terraform.lock.hcl", "stacks.tf.json", "zzz.auto.tfvars.json"]
 helpers.directory_copy(basedir, workdir, ignore=reserved)
 helpers.directory_copy(cwd, workdir, ignore=reserved+[
-    "layer.tfvars",
+    "layer.tfvars", "*.layer.tfvars",
     pathlib.Path(os.getenv("PLANFILE","default.tfplan")).name,  # do not copy plan files (binary)
     pathlib.Path(os.getenv("SHOWFILE","default.json")).name,    # do not copy plan files (json)
 ])
 
-files_tf     = sorted(glob.glob(str(workdir.joinpath("*.tf"))))
-files_tfvars = sorted(glob.glob(str(workdir.joinpath("*.auto.tfvars"))))
-
 # render files
-helpers.jinja2_render(files_tf, {"var": variables})
+helpers.jinja2_render([workdir.joinpath("*.tf")], {"var": variables})
 
 # initialize universe
 universe = {"terraform": {}, "provider": [], "variable": {}}
@@ -88,9 +85,9 @@ universe["terraform"]["backend"] = {"s3": {
 # add missing variables' declarations
 variables_declared = [
     list(variable.keys())[0]
-    for variable in helpers.hcl2_read(files_tf).get("variable", [])
+    for variable in helpers.hcl2_read([workdir.joinpath("*.tf")]).get("variable", [])
 ]
-for variable in {**variables, **helpers.hcl2_read(files_tfvars)}.keys():  # also autodeclare variables in *.auto.tfvars files
+for variable in {**variables, **helpers.hcl2_read([workdir.joinpath("*.tfvars")])}.keys():  # also autodeclare variables in *.auto.tfvars files
     if variable not in variables_declared:
         universe["variable"][variable] = {}
 

@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import fnmatch
+import glob
 import json
 import pathlib
 import shutil
@@ -43,6 +45,7 @@ def directory_copy(srcpath, dstpath, ignore=[]):
                 item in ignore
                 or item == dstpath.name
                 or parent == dstpath.name
+                or any(fnmatch.fnmatch(item, pattern) for pattern in ignore)
             )
         ]
     shutil.copytree(srcpath, dstpath, ignore=ignorefunc, dirs_exist_ok=True)
@@ -74,20 +77,21 @@ def directory_remove(path, keep=[]):
     directory_remove(temp)
 
 
-def json_read(paths):
-    """Read JSON files in 'paths' and return their merged contents.
+def json_read(patterns):
+    """Read JSON files in 'patterns' and return their merged contents.
 
     Keyword arguments:
-      paths[str/list]: path/s to JSON file/s, in ascending order of priority
+      patterns[str/list]: pattern/s to JSON file/s, in ascending order of priority
     """
-    assert(isinstance(paths, list))
+    assert(isinstance(patterns, list))
     data = {}
-    for path in paths:
-        path = pathlib.Path(path)
-        if not path.is_file():
-            continue
-        with open(path, "r") as f:
-            data = deepmerge.always_merger.merge(data, json.load(f))
+    for pattern in patterns:
+        for path in sorted(glob.glob(str(pattern))):
+            path = pathlib.Path(path)
+            if not path.is_file():
+                continue
+            with open(path, "r") as f:
+                data = deepmerge.always_merger.merge(data, json.load(f))
     return data
 
 
@@ -103,20 +107,21 @@ def json_write(data, path, indent=2):
         json.dump(data, f, indent=indent)
 
 
-def yaml_read(paths):
-    """Read YAML files in 'paths' and return their merged contents.
+def yaml_read(patterns):
+    """Read YAML files in 'patterns' and return their merged contents.
 
     Keyword arguments:
-      paths[str/list]: path/s to YAML file/s, in ascending order of priority
+      patterns[str/list]: pattern/s to YAML file/s, in ascending order of priority
     """
-    assert(isinstance(paths, list))
+    assert(isinstance(patterns, list))
     data = {}
-    for path in paths:
-        path = pathlib.Path(path)
-        if not path.is_file():
-            continue
-        with open(path, "r") as f:
-            data = deepmerge.always_merger.merge(data, yaml.safe_load(f))
+    for pattern in patterns:
+        for path in sorted(glob.glob(str(pattern))):
+            path = pathlib.Path(path)
+            if not path.is_file():
+                continue
+            with open(path, "r") as f:
+                data = deepmerge.always_merger.merge(data, yaml.safe_load(f))
     return data
 
 
@@ -131,37 +136,39 @@ def yaml_write(data, path, indent=2, width=1000):
         yaml.dump(data, f, indent=indent, width=width)
 
 
-def hcl2_read(paths):
-    """Read HCL2 files in 'paths' and return their merged contents.
+def hcl2_read(patterns):
+    """Read HCL2 files in 'patterns' and return their merged contents.
 
     Keyword arguments:
-      paths[str/list]: path/s to HCL2 file/s, in ascending order of priority
+      patterns[str/list]: pattern/s to HCL2 file/s, in ascending order of priority
     """
-    assert(isinstance(paths, list))
+    assert(isinstance(patterns, list))
     data = {}
-    for path in paths:
-        path = pathlib.Path(path)
-        if not path.is_file():
-            continue
-        with open(path, "r") as f:
-            data = deepmerge.always_merger.merge(data, hcl2.load(f))
+    for pattern in patterns:
+        for path in sorted(glob.glob(str(pattern))):
+            path = pathlib.Path(path)
+            if not path.is_file():
+                continue
+            with open(path, "r") as f:
+                data = deepmerge.always_merger.merge(data, hcl2.load(f))
     return data
 
 
-def jinja2_render(paths, data):
-    """Overwrite files in 'paths' with their Jinja2 render.
+def jinja2_render(patterns, data):
+    """Overwrite files in 'patterns' with their Jinja2 render.
 
     Keyword arguments:
-      paths[str/list]: path/s to text file/s
+      patterns[str/list]: pattern/s of text file/s
       data[dict]: variables to render files with
     """
-    assert(isinstance(paths, list))
-    for path in paths:
-        path = pathlib.Path(path)
-        if not path.is_file():
-            continue
-        with open(path, "r") as fin:
-            template = jinja2.Template(fin.read())
-        rendered = template.render(data)
-        with open(path, "w") as fout:
-            fout.write(rendered)
+    assert(isinstance(patterns, list))
+    for pattern in patterns:
+        for path in sorted(glob.glob(str(pattern))):
+            path = pathlib.Path(path)
+            if not path.is_file():
+                continue
+            with open(path, "r") as fin:
+                template = jinja2.Template(fin.read())
+            rendered = template.render(data)
+            with open(path, "w") as fout:
+                fout.write(rendered)
