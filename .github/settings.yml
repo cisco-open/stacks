@@ -10,7 +10,7 @@ repository:
   description: Stacks
 
   # Either `true` to make the repository private, or `false` to make it public.
-  private: true
+  private: false
 
   # A URL with more information about the repository
   #homepage: https://example.github.io/
