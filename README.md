@@ -1,5 +1,6 @@
 <div align="center">
-	<p><img src=".github/logo.png" width="125px"></p>
+    <br>
+	<p><img src=".github/logo.png" width="200px"></p>
 	<h1>Stacks for Terraform</h1>
 	<p>The <a href="https://www.terraform.io/">Terraform</a> code pre-processor</p>
 </div>
