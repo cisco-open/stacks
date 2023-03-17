@@ -7,7 +7,7 @@ repository:
   name: stacks
 
   # A short description of the repository that will show up on GitHub
-  description: Stacks
+  description: Stacks, the Terraform code pre-processor
 
   # Either `true` to make the repository private, or `false` to make it public.
   private: false
@@ -16,7 +16,7 @@ repository:
   #homepage: https://example.github.io/
 
   # A comma-separated list of topics to set on the repository
-  #topics: github, probot
+  topics: terraform
 
   # Either `true` to enable issues for this repository, `false` to disable them.
   #has_issues: true
