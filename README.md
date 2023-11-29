@@ -90,6 +90,8 @@ your-terraform-repository/
         └── stack.tfvars
 ```
 
+You can find [another example here](example/stacks/example) with all the appropriate file contents.
+
 Then you need to run Stacks in the layer you want to apply:
 ```bash
 cd stacks/vpc/layers/production
