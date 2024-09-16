@@ -87,7 +87,7 @@ variables_declared = [
     list(variable.keys())[0]
     for variable in helpers.hcl2_read([workdir.joinpath("*.tf")]).get("variable", [])
 ]
-for variable in {**variables, **helpers.hcl2_read([workdir.joinpath("*.tfvars")])}.keys():  # also autodeclare variables in *.auto.tfvars files
+for variable in {**variables, **helpers.hcl2_read([workdir.joinpath("*.auto.tfvars")])}.keys():  # also autodeclare variables in *.auto.tfvars files
     if variable not in variables_declared:
         universe["variable"][variable] = {}
 
