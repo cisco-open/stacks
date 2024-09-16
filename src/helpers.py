@@ -64,19 +64,12 @@ def directory_remove(path, keep=[]):
     if not path.is_dir():
         return
 
-    temp = pathlib.Path(tempfile.TemporaryDirectory(dir=pathlib.Path().cwd()).name)
-    for item in keep:
-        itempath = path.joinpath(item)
-        if itempath.exists():
-            shutil.move(itempath, temp.joinpath(item))
-
-    shutil.rmtree(path)
-
-    for item in keep:
-        itempath = temp.joinpath(item)
-        if itempath.exists():
-            shutil.move(itempath, path.joinpath(item))
-    directory_remove(temp)
+    for item in path.iterdir():
+        if item.name not in keep:
+            if item.is_dir():
+                shutil.rmtree(item)
+            else:
+                item.unlink()
 
 
 def json_read(patterns):
