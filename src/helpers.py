@@ -26,6 +26,8 @@ import hcl2
 import jinja2
 import yaml
 
+import filters
+
 
 def directory_copy(srcpath, dstpath, ignore=[]):
     """Copy the contents of the dir in 'srcpath' to the dir in 'dstpath'.
@@ -167,8 +169,20 @@ def jinja2_render(patterns, data):
             path = pathlib.Path(path)
             if not path.is_file():
                 continue
-            with open(path, "r") as fin:
-                template = jinja2.Template(fin.read())
-            rendered = template.render(data)
-            with open(path, "w") as fout:
-                fout.write(rendered)
+            try:
+                with open(path, "r") as fin:
+                    template = jinja2.Template(fin.read())
+
+                rendered = template.render(data | {
+                    func.__name__: func
+                    for func in filters.__all__
+                })
+
+                with open(path, "w") as fout:
+                    fout.write(rendered)
+            except jinja2.exceptions.UndefinedError as e:
+                print(f"Failure to render {path}: {e}", file=sys.stderr)
+                sys.exit(1)
+            except jinja2.exceptions.TemplateSyntaxError as e:
+                print(f"Failure to render {path} at line {e.lineno}, in statement {e.source}: {e}", file=sys.stderr)
+                sys.exit(1)
