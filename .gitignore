@@ -164,8 +164,14 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# VS Code
+.vscode
+
 # macOS metadata files
 .DS_Store
 
 # stacks terraform output directories
 stacks.out/
+
+# but keep any used for testing
+!tests/**/stacks.out/

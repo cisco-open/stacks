@@ -1,0 +1,79 @@
+{
+  "terraform": {
+    "backend": {
+      "s3": {
+        "role_arn": "CHANGEME",
+        "region": "CHANGEME",
+        "bucket": "CHANGEME",
+        "dynamodb_table": "CHANGEME",
+        "key": "layers/example/terraform.tfstate"
+      }
+    }
+  },
+  "provider": [
+    {
+      "aws": {
+        "region": "CHANGEME",
+        "assume_role": [
+          {
+            "role_arn": "CHANGEME"
+          }
+        ],
+        "default_tags": [
+          {
+            "tags": {
+              "stacks-path": "stacks/example/layer/staging"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "aws": {
+        "alias": "staging",
+        "region": "CHANGEME",
+        "assume_role": [
+          {
+            "role_arn": "CHANGEME"
+          }
+        ],
+        "default_tags": [
+          {
+            "tags": {
+              "stacks-path": "stacks/example/layer/staging"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "aws": {
+        "alias": "production",
+        "region": "CHANGEME",
+        "assume_role": [
+          {
+            "role_arn": "CHANGEME"
+          }
+        ],
+        "default_tags": [
+          {
+            "tags": {
+              "stacks-path": "stacks/example/layer/staging"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "variable": {
+    "role_arn": {},
+    "region": {},
+    "feedback": {},
+    "stacks-root": {},
+    "stacks-path": {},
+    "stacks-stack": {},
+    "stacks-layer": {},
+    "stacks-environment": {},
+    "stacks-instance": {}
+  }
+}
