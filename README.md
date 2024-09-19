@@ -65,7 +65,7 @@ Here's an example (not necessarily what we recommend):
 ```
 your-terraform-repository/
 │
-├── src/                          # the contents of the `src` directory
+├── terraform_stacks/             # the contents of the `terraform_stacks` directory
 │   ├── helpers.py
 │   ├── postinit.py
 │   └── preinit.py
@@ -95,10 +95,10 @@ You can find [another example here](example/stacks/example) with all the appropr
 Then you need to run Stacks in the layer you want to apply:
 ```bash
 cd stacks/vpc/layers/production
-python3 ../../../../src/preinit.py
+python3 ../../../../terraform_stacks/preinit.py
 cd stacks.out  # where the preinit output goes
 terraform init
-python3 ../../../../../src/postinit.py
+python3 ../../../../../terraform_stacks/postinit.py
 ```
 
 Now you're ready to run any further `terraform` commands in the `stacks.out` directory.
