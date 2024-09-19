@@ -1,5 +1,0 @@
-deepmerge==1.0.1
-GitPython==3.1.30
-Jinja2==3.1.2
-python-hcl2==3.0.5
-PyYAML==6.0

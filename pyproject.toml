@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "terraform-stacks"
+version = "0.1.0"
+authors = [
+    { name="Ricard Bejarano" }
+]
+description = "The Terraform code pre-processor"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "deepmerge==1.0.1",
+    "GitPython==3.1.30",
+    "Jinja2==3.1.2",
+    "python-hcl2==3.0.5",
+    "PyYAML==6.0",
+]
+
+[project.scripts]
+stacks = "terraform_stacks.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/cisco-open/stacks"
+Issues = "https://github.com/cisco-open/stacks/issues"

@@ -59,16 +59,16 @@ Here's an overview of Stacks inner workings:
 
 ## How to use Stacks?
 
-First, you need to put the Stacks code somewhere close to your stack definitions.
-Here's an example (not necessarily what we recommend):
+First, install the package with `pip`:
 
+```shell
+pip install git+https://github.com/cisco-open/stacks
 ```
+
+Next, configure your stack definitions. Here's an example:
+
+```plain
 your-terraform-repository/
-│
-├── terraform_stacks/             # the contents of the `terraform_stacks` directory
-│   ├── helpers.py
-│   ├── postinit.py
-│   └── preinit.py
 │
 ├── environments/                 # see the `example` directory on how to set this up
 │   ├── production/
@@ -93,12 +93,13 @@ your-terraform-repository/
 You can find [another example here](example/stacks/example) with all the appropriate file contents.
 
 Then you need to run Stacks in the layer you want to apply:
-```bash
+
+```shell
 cd stacks/vpc/layers/production
-python3 ../../../../terraform_stacks/preinit.py
+stacks preinit
 cd stacks.out  # where the preinit output goes
 terraform init
-python3 ../../../../../terraform_stacks/postinit.py
+stacks postinit
 ```
 
 Now you're ready to run any further `terraform` commands in the `stacks.out` directory.
