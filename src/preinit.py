@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2023 Cisco Systems, Inc.
+# Copyright 2024 Cisco Systems, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ variables_declared = [
     list(variable.keys())[0]
     for variable in helpers.hcl2_read([workdir.joinpath("*.tf")]).get("variable", [])
 ]
-for variable in {**variables, **helpers.hcl2_read([workdir.joinpath("*.tfvars")])}.keys():  # also autodeclare variables in *.auto.tfvars files
+for variable in {**variables, **helpers.hcl2_read([workdir.joinpath("*.auto.tfvars")])}.keys():  # also autodeclare variables in *.auto.tfvars files
     if variable not in variables_declared:
         universe["variable"][variable] = {}
 

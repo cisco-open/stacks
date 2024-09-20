@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2023 Cisco Systems, Inc.
+# Copyright 2024 Cisco Systems, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 import fnmatch
 import glob
 import json
+import os
 import pathlib
 import shutil
 import tempfile
@@ -25,6 +26,9 @@ import deepmerge
 import hcl2
 import jinja2
 import yaml
+
+import filters
+from tools import encryption_decrypt
 
 
 def directory_copy(srcpath, dstpath, ignore=[]):
@@ -62,19 +66,12 @@ def directory_remove(path, keep=[]):
     if not path.is_dir():
         return
 
-    temp = pathlib.Path(tempfile.TemporaryDirectory(dir=pathlib.Path().cwd()).name)
-    for item in keep:
-        itempath = path.joinpath(item)
-        if itempath.exists():
-            shutil.move(itempath, temp.joinpath(item))
-
-    shutil.rmtree(path)
-
-    for item in keep:
-        itempath = temp.joinpath(item)
-        if itempath.exists():
-            shutil.move(itempath, path.joinpath(item))
-    directory_remove(temp)
+    for item in path.iterdir():
+        if item.name not in keep:
+            if item.is_dir():
+                shutil.rmtree(item)
+            else:
+                item.unlink()
 
 
 def json_read(patterns):
@@ -151,6 +148,31 @@ def hcl2_read(patterns):
                 continue
             with open(path, "r") as f:
                 data = deepmerge.always_merger.merge(data, hcl2.load(f))
+    return hcl2_decrypt(data)
+
+
+def hcl2_decrypt(data):
+    """Decrypts all strings in 'data'.
+
+    Keyword arguments:
+      data[any]: any HCL2-sourced data structure
+    """
+    if isinstance(data, str) and data.startswith("ENC[") and data.endswith("]"):
+        key_path = os.getenv("STACKS_PRIVATE_KEY_PATH")
+        if not key_path:
+            raise Exception("could not decrypt data: STACKS_PRIVATE_KEY_PATH is not set")
+        if not pathlib.Path(key_path).exists():
+            raise Exception(f"could not decrypt data: STACKS_PRIVATE_KEY_PATH ({key_path}) does not exist")
+        return encryption_decrypt.main(data, key_path)
+
+    elif isinstance(data, list):
+        for i in range(len(data)):
+            data[i] = hcl2_decrypt(data[i])
+
+    elif isinstance(data, dict):
+        for k, v in data.items():
+            data[k] = hcl2_decrypt(v)
+
     return data
 
 
@@ -167,8 +189,20 @@ def jinja2_render(patterns, data):
             path = pathlib.Path(path)
             if not path.is_file():
                 continue
-            with open(path, "r") as fin:
-                template = jinja2.Template(fin.read())
-            rendered = template.render(data)
-            with open(path, "w") as fout:
-                fout.write(rendered)
+            try:
+                with open(path, "r") as fin:
+                    template = jinja2.Template(fin.read())
+
+                rendered = template.render(data | {
+                    func.__name__: func
+                    for func in filters.__all__
+                })
+
+                with open(path, "w") as fout:
+                    fout.write(rendered)
+            except jinja2.exceptions.UndefinedError as e:
+                print(f"Failure to render {path}: {e}", file=sys.stderr)
+                sys.exit(1)
+            except jinja2.exceptions.TemplateSyntaxError as e:
+                print(f"Failure to render {path} at line {e.lineno}, in statement {e.source}: {e}", file=sys.stderr)
+                sys.exit(1)
