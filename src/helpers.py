@@ -17,6 +17,7 @@
 import fnmatch
 import glob
 import json
+import os
 import pathlib
 import shutil
 import tempfile
@@ -27,6 +28,7 @@ import jinja2
 import yaml
 
 import filters
+from tools import encryption_decrypt
 
 
 def directory_copy(srcpath, dstpath, ignore=[]):
@@ -146,6 +148,31 @@ def hcl2_read(patterns):
                 continue
             with open(path, "r") as f:
                 data = deepmerge.always_merger.merge(data, hcl2.load(f))
+    return hcl2_decrypt(data)
+
+
+def hcl2_decrypt(data):
+    """Decrypts all strings in 'data'.
+
+    Keyword arguments:
+      data[any]: any HCL2-sourced data structure
+    """
+    if isinstance(data, str) and data.startswith("ENC[") and data.endswith("]"):
+        key_path = os.getenv("STACKS_PRIVATE_KEY_PATH")
+        if not key_path:
+            raise Exception("could not decrypt data: STACKS_PRIVATE_KEY_PATH is not set")
+        if not pathlib.Path(key_path).exists():
+            raise Exception(f"could not decrypt data: STACKS_PRIVATE_KEY_PATH ({key_path}) does not exist")
+        return encryption_decrypt.main(data, key_path)
+
+    elif isinstance(data, list):
+        for i in range(len(data)):
+            data[i] = hcl2_decrypt(data[i])
+
+    elif isinstance(data, dict):
+        for k, v in data.items():
+            data[k] = hcl2_decrypt(v)
+
     return data
 
 

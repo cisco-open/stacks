@@ -17,9 +17,9 @@
 import glob
 import pathlib
 
-import helpers
-
 import git
+
+import helpers
 
 
 # define context
