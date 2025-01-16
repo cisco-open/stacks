@@ -1,0 +1,52 @@
+import glob
+import json
+import pathlib
+
+import hcl2
+
+from .crypto import decrypt
+from .merge import merge
+
+
+def config_read(patterns, decoderfunc, **decoderargs):
+    """Read configuration files in 'patterns' using 'decoderfunc' and return their merged contents.
+
+    Keyword arguments:
+      patterns[list]: patterns to configuration files, in ascending order of priority
+      decoderfunc[function]: function that parses a given configuration file into a data structure
+      decoderargs[dict]: keyword arguments to pass to decoderfunc
+    """
+    assert isinstance(patterns, list)
+    data = {}
+    for pattern in patterns:
+        for path in sorted(glob.glob(str(pattern))):
+            path = pathlib.Path(path)
+            if path.is_file():
+                with open(path, "r") as f:
+                    data = merge(data, decoderfunc(f, **decoderargs))
+    return decrypt(data)
+
+
+def json_read(patterns):
+    return config_read(patterns, json.load)
+
+
+def hcl2_read(patterns):
+    return config_read(patterns, hcl2.load)
+
+
+def config_write(data, path, encoderfunc, **encoderargs):
+    """Write 'data' to file in 'path' using 'encoderfunc' for formatting.
+
+    Keyword arguments:
+      data[any]: structure to write to file
+      path[pathlib.Path]: destination file path
+      encoderfunc[function]: function that formats a given data structure into a configuration file
+      encoderargs[dict]: keyword arguments to pass to encoderfunc
+    """
+    with open(path, "w") as f:
+        encoderfunc(data, f, **encoderargs)
+
+
+def json_write(data, path):
+    config_write(data, path, json.dump, indent=2)

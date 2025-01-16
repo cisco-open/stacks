@@ -5,102 +5,57 @@
 </div>
 
 
-## What is Stacks for Terraform?
+## What is Stacks?
 
-**Stacks** is a code pre-processor for Terraform. It implements a **sustainable scaling pattern**, **prevents drift** and **boilerplate**, all while **plugging into your already existing Terraform pipeline**.
+**Stacks** is a [Terraform](https://www.terraform.io/) code pre-processor.
+Its primary goal is to minimize your total Terraform codebase without giving up on coverage. To do more with less.
 
-Stacks was initially presented at [SREcon23 Americas](https://www.usenix.org/conference/srecon23americas/presentation/bejarano).
+As a code pre-processor, Stacks receives your "input code" and returns "output code" for Terraform to consume.
 
-***Warning:** Stacks is under heavy development, many things may change.*
+Stacks was originally developed and continues to be maintained by the Infrastructure SRE team at [Cisco ThousandEyes](https://www.thousandeyes.com/).
+It was initially presented and open-sourced at [SREcon23 Americas](https://www.usenix.org/conference/srecon23americas/presentation/bejarano).
 
+You can read "Terraform" and "OpenTofu" interchangeably, Stacks works with both but we've chosen to go with "Terraform" for readability.
 
-## What is a "stack"?
-
-- A **stack** is a set of Terraform resources you want to deploy one or more times.
-- Each instance of a stack is a **layer**. A stack has one or more layers, hence, the name "stacks".
-
-### Example
-
-```
-vpc/
-│
-├── base/
-│   ├── vpc.tf
-│   └── subnets.tf
-│
-├── layers/
-│   ├── production/
-│   │   └── layer.tfvars
-│   └── staging/
-│       ├── layer.tfvars
-│       └── vpn.tf
-│
-└── stack.tfvars
-```
-
-- This is an example stack called `vpc`.
-- It contains a `base` folder, containing the common Terraform configuration scoped for all layers in this stack.
-- It contains a `layers` folder with two layers, one called `production` and one called `staging`. Layer directories contain layer-specific Terraform configuration.
-- Finally, it contains an optional `stack.tfvars` file, which defines variables global to all layers in the stack. These variables can be overriden at the layer level through a layer-specific `layer.tfvars`.
+The ["I am starting from scratch" quick-start guide](<2.2. I am starting from scratch.md>) is a good introduction to Stacks and what it does.
 
 
-## How does Stacks work?
+## Documentation
 
-Stacks sits between you (the Terraform user) and Terraform. It's a **code pre-processor**.
-Here's an overview of Stacks inner workings:
+1. About
+    1. [Considerations before using](<docs/1.1. Considerations before using.md>)
+    2. [Stacks vs. its alternatives](<docs/1.2. Stacks vs its alternatives.md>)
 
-1. It takes your stack definitions (as shown above)
-1. For each layer:
-  1. Joins the `base` code with the layer-specific code
-  1. Applies a number of transformations
-  1. Injects some extra configuration
-  1. Bundles it up for Terraform to plan/apply on it
+2. Quick-start guide
+    1. [Installation instructions](<docs/2.1. Installation instructions.md>)
+    2. [I am starting from scratch](<docs/2.2. I am starting from scratch.md>)
+    3. [I am collaborating to an existing stack](<docs/2.3. I am collaborating to an existing stack.md>)
+    4. [I am collaborating to Stacks itself](<docs/2.4. I am collaborating to Stacks itself.md>)
 
-
-## How to use Stacks?
-
-First, you need to put the Stacks code somewhere close to your stack definitions.
-Here's an example (not necessarily what we recommend):
-
-```
-your-terraform-repository/
-│
-├── src/                          # the contents of the `src` directory
-│   ├── helpers.py
-│   ├── postinit.py
-│   └── preinit.py
-│
-├── environments/                 # see the `example` directory on how to set this up
-│   ├── production/
-│   │   ├── backend.tfvars
-│   │   └── environment.tfvars
-│   └── staging/
-│
-└── stacks/                       # put your stack definitions here
-    └── vpc/                      # the `vpc` stack shown above
-        ├── base/
-        │   ├── vpc.tf
-        │   └── subnets.tf
-        ├── layers/
-        │   ├── production/
-        │   │   └── layer.tfvars
-        │   └── staging/
-        │       ├── layer.tfvars
-        │       └── vpn.tf
-        └── stack.tfvars
-```
-
-You can find [another example here](example/stacks/example) with all the appropriate file contents.
-
-Then you need to run Stacks in the layer you want to apply:
-```bash
-cd stacks/vpc/layers/production
-python3 ../../../../src/preinit.py
-cd stacks.out  # where the preinit output goes
-terraform init
-python3 ../../../../../src/postinit.py
-```
-
-Now you're ready to run any further `terraform` commands in the `stacks.out` directory.
-
-***Note:** we recommend putting `stacks.out` in `.gitignore` to prevent it from being tracked by git.*
+3. Reference
+    1. Native features
+        1. [Global Terraform code](<docs/3.1.1. Global Terraform code.md>)
+        2. [Reusable root modules](<docs/3.1.2. Reusable root modules.md>)
+        3. [Jinja templating for Terraform](<docs/3.1.3. Jinja templating for Terraform.md>)
+        4. [Jinja templating for variables](<docs/3.1.4. Jinja templating for variables.md>)
+        5. [Remote lookup functions](<docs/3.1.5. Remote lookup functions.md>)
+        6. [Inline secret encryption](<docs/3.1.6. Inline secret encryption.md>)
+        7. [Automatic variable initialization](<docs/3.1.7. Automatic variable initialization.md>)
+    2. Features you can build with Stacks
+        1. [Terraform state backend configuration](<docs/3.2.1. Terraform state backend configuration.md>)
+        2. [Terraform provider generation](<docs/3.2.2. Terraform provider generation.md>)
+        3. [Input validation](<docs/3.2.3. Input validation.md>)
+    3. Command-line interface
+        1. [`stacks render`](<docs/3.3.1. stacks render.md>)
+        2. [`stacks terraform`](<docs/3.3.2. stacks terraform.md>)
+        3. [`stacks diff`](<docs/3.3.3. stacks diff.md>)
+        4. [`stacks encrypt`](<docs/3.3.4. stacks encrypt.md>)
+        5. [`stacks decrypt`](<docs/3.3.5. stacks decrypt.md>)
+        6. [`stacks surgery list`](<docs/3.3.6. stacks surgery list.md>)
+        7. [`stacks surgery import`](<docs/3.3.7. stacks surgery import.md>)
+        8. [`stacks surgery remove`](<docs/3.3.8. stacks surgery remove.md>)
+        9. [`stacks surgery rename`](<docs/3.3.9. stacks surgery rename.md>)
+        10. [`stacks surgery move`](<docs/3.3.10. stacks surgery move.md>)
+        11. [`stacks surgery edit`](<docs/3.3.11. stacks surgery edit.md>)
+    4. [Directory structure](<docs/3.4. Directory structure.md>)
+    5. [Special variables](<docs/3.5. Special variables.md>)
