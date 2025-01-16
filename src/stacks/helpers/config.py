@@ -3,16 +3,18 @@ import json
 import pathlib
 
 import hcl2
+import yaml
 
 from .crypto import decrypt
 from .merge import merge
 
 
-def config_read(patterns, decoderfunc, **decoderargs):
+def config_read(patterns, should_decrypt, decoderfunc, **decoderargs):
     """Read configuration files in 'patterns' using 'decoderfunc' and return their merged contents.
 
     Keyword arguments:
       patterns[list]: patterns to configuration files, in ascending order of priority
+      should_decrypt[bool]: whether to decrypt data or not
       decoderfunc[function]: function that parses a given configuration file into a data structure
       decoderargs[dict]: keyword arguments to pass to decoderfunc
     """
@@ -24,15 +26,19 @@ def config_read(patterns, decoderfunc, **decoderargs):
             if path.is_file():
                 with open(path, "r") as f:
                     data = merge(data, decoderfunc(f, **decoderargs))
-    return decrypt(data)
+    return decrypt(data) if should_decrypt else data
 
 
-def json_read(patterns):
-    return config_read(patterns, json.load)
+def json_read(patterns, should_decrypt=True):
+    return config_read(patterns, should_decrypt, json.load)
 
 
-def hcl2_read(patterns):
-    return config_read(patterns, hcl2.load)
+def yaml_read(patterns, should_decrypt=True):
+    return config_read(patterns, should_decrypt, yaml.safe_load)
+
+
+def hcl2_read(patterns, should_decrypt=True):
+    return config_read(patterns, should_decrypt, hcl2.load)
 
 
 def config_write(data, path, encoderfunc, **encoderargs):
@@ -50,3 +56,7 @@ def config_write(data, path, encoderfunc, **encoderargs):
 
 def json_write(data, path):
     config_write(data, path, json.dump, indent=2)
+
+
+def yaml_write(data, path):
+    config_write(data, path, yaml.dump, indent=2, width=1000)
