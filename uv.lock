@@ -313,7 +313,7 @@ wheels = [
 
 [[package]]
 name = "stacks"
-version = "2.0.3"
+version = "2.0.7"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
@@ -334,6 +334,6 @@ requires-dist = [
     { name = "gitpython", specifier = ">=3.1.43" },
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "packaging", specifier = ">=24.2" },
-    { name = "python-hcl2", specifier = ">=5.1.1" },
+    { name = "python-hcl2", specifier = "<6.0.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
 ]
