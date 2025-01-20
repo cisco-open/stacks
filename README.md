@@ -38,7 +38,7 @@ The ["I am starting from scratch" quick-start guide](<2.2. I am starting from sc
         2. [Reusable root modules](<docs/3.1.2. Reusable root modules.md>)
         3. [Jinja templating for Terraform](<docs/3.1.3. Jinja templating for Terraform.md>)
         4. [Jinja templating for variables](<docs/3.1.4. Jinja templating for variables.md>)
-        5. [Remote lookup functions](<docs/3.1.5. Remote lookup functions.md>)
+        5. [Custom Jinja functions](<docs/3.1.5. Custom Jinja functions.md>)
         6. [Inline secret encryption](<docs/3.1.6. Inline secret encryption.md>)
         7. [Automatic variable initialization](<docs/3.1.7. Automatic variable initialization.md>)
     2. Features you can build with Stacks
