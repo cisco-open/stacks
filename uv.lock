@@ -63,7 +63,7 @@ name = "click"
 version = "8.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
 wheels = [
@@ -148,6 +148,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/c0/89/37df0b71473153574
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1d/9a/4114a9057db2f1462d5c8f8390ab7383925fe1ac012eaa42402ad65c2963/GitPython-3.1.44-py3-none-any.whl", hash = "sha256:9e0e10cda9bed1ee64bc9a6de50e7e38a9c9943241cd7f585f6df3ed28011110", size = 207599 },
 ]
+
+[[package]]
+name = "importlib"
+version = "1.0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/31/77/3781f65cafe55480b56914def99022a5d2965a4bb269655c89ef2f1de3cd/importlib-1.0.4.zip", hash = "sha256:b6ee7066fea66e35f8d0acee24d98006de1a0a8a94a8ce6efe73a9a23c8d9826", size = 7074 }
 
 [[package]]
 name = "jinja2"
@@ -313,13 +319,14 @@ wheels = [
 
 [[package]]
 name = "stacks"
-version = "2.0.7"
+version = "2.0.8"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
     { name = "cryptography" },
     { name = "deepmerge" },
     { name = "gitpython" },
+    { name = "importlib" },
     { name = "jinja2" },
     { name = "packaging" },
     { name = "python-hcl2" },
@@ -332,6 +339,7 @@ requires-dist = [
     { name = "cryptography", specifier = ">=43.0.3" },
     { name = "deepmerge", specifier = ">=2.0" },
     { name = "gitpython", specifier = ">=3.1.43" },
+    { name = "importlib", specifier = ">=1.0.4" },
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "packaging", specifier = ">=24.2" },
     { name = "python-hcl2", specifier = "<6.0.0" },
