@@ -57,5 +57,6 @@ The ["I am starting from scratch" quick-start guide](<2.2. I am starting from sc
         9. [`stacks surgery rename`](<docs/3.3.9. stacks surgery rename.md>)
         10. [`stacks surgery move`](<docs/3.3.10. stacks surgery move.md>)
         11. [`stacks surgery edit`](<docs/3.3.11. stacks surgery edit.md>)
+        12. [`stacks version`](<docs/3.3.12. stacks version.md>)
     4. [Directory structure](<docs/3.4. Directory structure.md>)
     5. [Special variables](<docs/3.5. Special variables.md>)
