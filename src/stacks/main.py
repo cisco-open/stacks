@@ -1,4 +1,6 @@
+import importlib.metadata
 import pathlib
+import platform
 
 import click
 
@@ -14,6 +16,12 @@ def cli():
     All commands MUST run within a layer directory, unless noted otherwise.
     """
     pass
+
+
+@cli.command()
+def version():
+    print(f"Stacks {importlib.metadata.version('stacks')}")
+    print(f"Python {platform.python_version()}")
 
 
 @cli.command(hidden=True)  # hidden because it should not be used independently unless for advanced debugging purposes
