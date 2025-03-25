@@ -19,7 +19,7 @@ def jinja2_render(ctx, patterns, data={}):
             if path.is_file():
                 try:
                     with open(path, "r") as fin:
-                        template = jinja2.Template(fin.read())
+                        template = jinja2.Template(fin.read(), undefined=jinja2.StrictUndefined)
                     with open(path, "w") as fout:
                         filters_dict = {}
                         for filter in filters.__all__:
