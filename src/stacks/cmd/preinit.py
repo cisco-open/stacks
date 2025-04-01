@@ -24,10 +24,12 @@ def preinit(ctx):
     helpers.copy_files(ctx.stacks_dir, ctx.work_dir, include=["*.tf", "*.tfvars.jinja"], prefix="common_")
     helpers.copy_files(ctx.stack_dir, ctx.work_dir, include=["*.tfvars.jinja"], prefix="stack_")
     for item in ctx.base_dir.iterdir():
+        destination = ctx.work_dir.joinpath(item.name)
         if item.is_dir():
-            shutil.copytree(item, ctx.work_dir.joinpath(item.name), dirs_exist_ok=True)
+            shutil.copytree(item, destination, dirs_exist_ok=True)
         elif item.is_file() and not item.match("*.tf"):
-            shutil.copyfile(item, ctx.work_dir.joinpath(item.name))
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(item, destination)
     helpers.copy_files(ctx.base_dir, ctx.work_dir, include=["*.tf"], prefix="base_")
     helpers.copy_files(ctx.path, ctx.work_dir, include=["*.tfvars.jinja"], prefix="layer_")
 
