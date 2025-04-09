@@ -4,7 +4,7 @@ from .. import helpers
 
 
 def preinit(ctx):
-    helpers.directory_remove(ctx.work_dir, keep=[".terraform", ".terraform.lock.hcl"])
+    helpers.directory_remove(ctx.work_dir, keep=[".terraform", ".terraformrc", ".terraform.lock.hcl"])
 
     variables_predefined = {
         "stacks_path": f"stacks/{ctx.stack}/layer/{ctx.layer}",
