@@ -22,6 +22,8 @@ def cli():
 def version():
     print(f"Stacks {importlib.metadata.version('stacks')}")
     print(f"Python {platform.python_version()}")
+    terraform_output = helpers.run_command(cmd.config.TERRAFORM_PATH, "version", interactive=False)
+    print(f"Terraform {terraform_output.stdout.split('\n')[0].split(' ')[1][1:]}")
 
 
 @cli.command(hidden=True)  # hidden because it should not be used independently unless for advanced debugging purposes
