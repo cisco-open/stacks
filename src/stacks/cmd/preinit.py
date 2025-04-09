@@ -15,7 +15,7 @@ def preinit(ctx):
         "stacks_subenvironment": ctx.subenv or "",
         "stacks_instance": ctx.instance or "",
         "stacks_environments": {
-            item.name: helpers.hcl2_read([item.joinpath("env.tfvars")])  # TODO: replace 'env.tfvars' with '*.tfvars' after all stacks have been upgraded to v2
+            item.name: helpers.hcl2_read([item.joinpath("env.tfvars")], must_decrypt=False)  # TODO: replace 'env.tfvars' with '*.tfvars' after all stacks have been upgraded to v2
             for item in ctx.envs_dir.iterdir()
             if item.is_dir() and item.joinpath("env.tfvars").exists()
         },

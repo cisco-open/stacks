@@ -84,12 +84,13 @@ def encrypt(public_key_path, string):
     return f"ENC[{symmetric_key_encrypted_base64};{encryptor_tag_base64};{init_vector_base64};{string_encrypted_base64}]"
 
 
-def decrypt(data, private_key_path=os.getenv("STACKS_PRIVATE_KEY_PATH")):
+def decrypt(data, private_key_path=os.getenv("STACKS_PRIVATE_KEY_PATH"), must_decrypt=True):
     """Decrypt 'data' using 'private_key_path'.
 
     Keyword arguments:
-      private_key_path[pathlib.Path]: path to private key
       data[any]: any data structure
+      private_key_path[pathlib.Path]: path to private key
+      must_decrypt[bool]: whether decryption should succeed (if False and fails, returns encrypted value)
     """
     if isinstance(data, str) and data.startswith("ENC[") and data.endswith("]"):
         (
@@ -105,14 +106,21 @@ def decrypt(data, private_key_path=os.getenv("STACKS_PRIVATE_KEY_PATH")):
                 password=None,
                 backend=cryptography.hazmat.backends.default_backend(),
             )
-        symmetric_key = private_key.decrypt(
-            base64.b64decode(symmetric_key_encrypted_base64.encode()),
-            cryptography.hazmat.primitives.asymmetric.padding.OAEP(
-                mgf=cryptography.hazmat.primitives.asymmetric.padding.MGF1(algorithm=cryptography.hazmat.primitives.hashes.SHA256()),
-                algorithm=cryptography.hazmat.primitives.hashes.SHA256(),
-                label=None,
-            ),
-        )
+
+        try:
+            symmetric_key = private_key.decrypt(
+                base64.b64decode(symmetric_key_encrypted_base64.encode()),
+                cryptography.hazmat.primitives.asymmetric.padding.OAEP(
+                    mgf=cryptography.hazmat.primitives.asymmetric.padding.MGF1(algorithm=cryptography.hazmat.primitives.hashes.SHA256()),
+                    algorithm=cryptography.hazmat.primitives.hashes.SHA256(),
+                    label=None,
+                ),
+            )
+        except ValueError as e:
+            if must_decrypt:
+                raise e
+            else:
+                return data
 
         init_vector = base64.b64decode(init_vector_base64.encode())
 
@@ -134,9 +142,9 @@ def decrypt(data, private_key_path=os.getenv("STACKS_PRIVATE_KEY_PATH")):
         return string_decrypted.decode("utf-8")
 
     elif isinstance(data, list):
-        return [decrypt(private_key_path=private_key_path, data=item) for item in data]
+        return [decrypt(private_key_path=private_key_path, data=item, must_decrypt=must_decrypt) for item in data]
 
     elif isinstance(data, dict):
-        return {key: decrypt(private_key_path=private_key_path, data=value) for key, value in data.items()}
+        return {key: decrypt(private_key_path=private_key_path, data=value, must_decrypt=must_decrypt) for key, value in data.items()}
 
     return data
