@@ -89,7 +89,7 @@ def decrypt(data, private_key_path=os.getenv("STACKS_PRIVATE_KEY_PATH"), must_de
 
     Keyword arguments:
       data[any]: any data structure
-      private_key_path[pathlib.Path]: path to private key
+      private_key_path[str]: path to private key
       must_decrypt[bool]: whether decryption should succeed (if False and fails, returns encrypted value)
     """
     if isinstance(data, str) and data.startswith("ENC[") and data.endswith("]"):

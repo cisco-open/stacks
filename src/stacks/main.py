@@ -82,7 +82,7 @@ def decrypt(private_key_path, string):
     Decrypt an encrypted string using a private key.
     Can run in any directory.
     """
-    print(helpers.decrypt(private_key_path=pathlib.Path(private_key_path), data=string))
+    print(helpers.decrypt(private_key_path=private_key_path, data=string))
 
 
 @cli.group()
