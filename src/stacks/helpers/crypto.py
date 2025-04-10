@@ -100,27 +100,32 @@ def decrypt(data, private_key_path=os.getenv("STACKS_PRIVATE_KEY_PATH"), must_de
             string_encrypted_base64,
         ) = data.removeprefix("ENC[").removesuffix("]").split(";")
 
-        with open(private_key_path, "rb") as f:
-            private_key = cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                f.read(),
-                password=None,
-                backend=cryptography.hazmat.backends.default_backend(),
-            )
+        private_key_paths = private_key_path.split(",")
+        for i in range(len(private_key_paths)):
+            with open(private_key_paths[i], "rb") as f:
+                private_key = cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                    f.read(),
+                    password=None,
+                    backend=cryptography.hazmat.backends.default_backend(),
+                )
 
-        try:
-            symmetric_key = private_key.decrypt(
-                base64.b64decode(symmetric_key_encrypted_base64.encode()),
-                cryptography.hazmat.primitives.asymmetric.padding.OAEP(
-                    mgf=cryptography.hazmat.primitives.asymmetric.padding.MGF1(algorithm=cryptography.hazmat.primitives.hashes.SHA256()),
-                    algorithm=cryptography.hazmat.primitives.hashes.SHA256(),
-                    label=None,
-                ),
-            )
-        except ValueError as e:
-            if must_decrypt:
-                raise e
-            else:
-                return data
+            try:
+                symmetric_key = private_key.decrypt(
+                    base64.b64decode(symmetric_key_encrypted_base64.encode()),
+                    cryptography.hazmat.primitives.asymmetric.padding.OAEP(
+                        mgf=cryptography.hazmat.primitives.asymmetric.padding.MGF1(algorithm=cryptography.hazmat.primitives.hashes.SHA256()),
+                        algorithm=cryptography.hazmat.primitives.hashes.SHA256(),
+                        label=None,
+                    ),
+                )
+                break
+            except ValueError as e:
+                if i < len(private_key_paths)-1:
+                    continue
+                elif must_decrypt:
+                    raise e
+                else:
+                    return data
 
         init_vector = base64.b64decode(init_vector_base64.encode())
 
