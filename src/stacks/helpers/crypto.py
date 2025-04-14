@@ -100,6 +100,12 @@ def decrypt(data, private_key_path=os.getenv("STACKS_PRIVATE_KEY_PATH"), must_de
             string_encrypted_base64,
         ) = data.removeprefix("ENC[").removesuffix("]").split(";")
 
+        if not private_key_path:
+            if must_decrypt:
+                raise Exception("please set the STACKS_PRIVATE_KEY_PATH environment variable")
+            else:
+                return data
+
         private_key_paths = private_key_path.split(",")
         for i in range(len(private_key_paths)):
             with open(private_key_paths[i], "rb") as f:
