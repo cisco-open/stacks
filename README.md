@@ -17,7 +17,7 @@ It was initially presented and open-sourced at [SREcon23 Americas](https://www.u
 
 You can read "Terraform" and "OpenTofu" interchangeably, Stacks works with both but we've chosen to go with "Terraform" for readability.
 
-The ["I am starting from scratch" quick-start guide](<2.2. I am starting from scratch.md>) is a good introduction to Stacks and what it does.
+The ["I am starting from scratch" quick-start guide](<docs/2.2. I am starting from scratch.md>) is a good introduction to Stacks and what it does.
 
 
 ## Documentation
