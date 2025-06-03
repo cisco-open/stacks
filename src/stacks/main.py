@@ -1,6 +1,7 @@
 import importlib.metadata
 import pathlib
 import platform
+import sys
 
 import click
 
@@ -65,12 +66,19 @@ def genkey(public_key_path, private_key_path):
 
 @cli.command()
 @click.option("--public-key-path", required=True)
-@click.argument("string")
-def encrypt(public_key_path, string):
+@click.option("--from-stdin", is_flag=True, help="Read input string from standard input")
+@click.argument("string", required=False)
+def encrypt(public_key_path, from_stdin, string):
     """
     Encrypt a secret string using a public key.
     Can run in any directory.
     """
+    if from_stdin:
+        string = sys.stdin.read()
+        if not string:
+            raise click.ClickException("No input received from stdin.")
+    elif string is None:
+        raise click.ClickException("You must provide either a string argument or use --from-stdin.")
     print(helpers.encrypt(public_key_path=pathlib.Path(public_key_path), string=string))
 
 
