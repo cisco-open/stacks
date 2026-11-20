@@ -37,7 +37,11 @@ def terraform_init_headless(ctx, argv, *args, **kwargs):
     preinit.preinit(ctx=remote_ctx)
     code = helpers.hcl2_read([remote_ctx.work_dir.joinpath("*.tf")])
     helpers.directory_remove(remote_ctx.work_dir)
-    helpers.json_write({"terraform": [{"backend": code["terraform"][0]["backend"]}]}, remote_ctx.universe_file)
+
+    backend_block = [item["backend"] for item in code["terraform"] if "backend" in item]
+    if not backend_block:
+        raise Exception("No backend configured in terraform block")    
+    helpers.json_write({"terraform": [{"backend": backend_block[0]}]}, remote_ctx.universe_file)
     helpers.run_command(config.TERRAFORM_PATH, f"-chdir={remote_ctx.work_dir}", "init")  # we cannot avoid pulling providers because we need to know the resources' schema
     return helpers.run_command(config.TERRAFORM_PATH, f"-chdir={remote_ctx.work_dir}", *argv, interactive=False).stdout
 
